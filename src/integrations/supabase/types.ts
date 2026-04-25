@@ -14,7 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      parking_slots: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          owner_name: string
+          picture_url: string | null
+          slot_code: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_name: string
+          picture_url?: string | null
+          slot_code: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_name?: string
+          picture_url?: string | null
+          slot_code?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          active: boolean
+          expires_at: string
+          id: string
+          reserved_at: string
+          reserver_name: string
+          slot_id: string
+        }
+        Insert: {
+          active?: boolean
+          expires_at: string
+          id?: string
+          reserved_at?: string
+          reserver_name: string
+          slot_id: string
+        }
+        Update: {
+          active?: boolean
+          expires_at?: string
+          id?: string
+          reserved_at?: string
+          reserver_name?: string
+          slot_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "parking_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
