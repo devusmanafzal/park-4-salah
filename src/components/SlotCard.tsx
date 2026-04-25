@@ -1,13 +1,13 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Clock, MapPin, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export type Slot = {
   id: string;
@@ -18,26 +18,36 @@ export type Slot = {
   status: string;
 };
 
-type Props = { slot: Slot; activeReservation?: { id: string; reserver_name: string; expires_at: string } | null; onChange: () => void };
+type Reservation = {
+  id: string;
+  reserver_name: string;
+  expires_at: string;
+  reserver_user_id: string | null;
+};
+
+type Props = { slot: Slot; activeReservation?: Reservation | null; onChange: () => void };
 
 const SlotCard = ({ slot, activeReservation, onChange }: Props) => {
+  const { user, profile, isAdmin } = useAuth();
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
 
   const isAvailable = slot.status === "available";
+  const isOwnReservation = !!activeReservation && activeReservation.reserver_user_id === user?.id;
+  const canRelease = isOwnReservation || isAdmin;
 
   const reserve = async () => {
-    const trimmed = name.trim();
-    if (trimmed.length < 2 || trimmed.length > 60) {
-      toast.error("Please enter your name (2–60 characters).");
+    if (!user) return;
+    if (profile?.locked) {
+      toast.error("Your account is locked. Please contact an admin.");
       return;
     }
     setBusy(true);
     const expires = new Date(Date.now() + 60 * 60 * 1000).toISOString();
     const { error } = await supabase.from("reservations").insert({
       slot_id: slot.id,
-      reserver_name: trimmed,
+      reserver_name: profile?.display_name ?? user.email ?? "Member",
+      reserver_user_id: user.id,
       expires_at: expires,
     });
     setBusy(false);
@@ -46,7 +56,6 @@ const SlotCard = ({ slot, activeReservation, onChange }: Props) => {
     } else {
       toast.success(`Slot ${slot.slot_code} reserved for 60 minutes.`);
       setOpen(false);
-      setName("");
       onChange();
     }
   };
@@ -100,18 +109,30 @@ const SlotCard = ({ slot, activeReservation, onChange }: Props) => {
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{slot.description}</p>
         )}
         {isAvailable ? (
-          <Button className="w-full" onClick={() => setOpen(true)}>
-            Reserve for 60 min
-          </Button>
+          user ? (
+            <Button className="w-full" onClick={() => setOpen(true)} disabled={profile?.locked}>
+              {profile?.locked ? "Account locked" : "Reserve for 60 min"}
+            </Button>
+          ) : (
+            <Button asChild className="w-full" variant="outline">
+              <Link to="/auth">Sign in to reserve</Link>
+            </Button>
+          )
         ) : activeReservation ? (
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Clock className="h-3.5 w-3.5" />
               Held by {activeReservation.reserver_name} · until {new Date(activeReservation.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </div>
-            <Button variant="outline" className="w-full" onClick={release} disabled={busy}>
-              Release slot
-            </Button>
+            {canRelease ? (
+              <Button variant="outline" className="w-full" onClick={release} disabled={busy}>
+                {isOwnReservation ? "Release my slot" : "Force release (admin)"}
+              </Button>
+            ) : (
+              <Button variant="outline" className="w-full" disabled>
+                Reserved by another member
+              </Button>
+            )}
           </div>
         ) : (
           <Button variant="outline" className="w-full" disabled>Unavailable</Button>
@@ -123,21 +144,10 @@ const SlotCard = ({ slot, activeReservation, onChange }: Props) => {
           <DialogHeader>
             <DialogTitle className="font-display">Reserve slot {slot.slot_code}</DialogTitle>
             <DialogDescription>
-              You're reserving this spot for 60 minutes. Please release it after Salah so others can use it.
+              You're reserving this spot for 60 minutes as {profile?.display_name ?? user?.email}. Please release it after Salah so others can use it.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="name">Your name</Label>
-            <Input
-              id="name"
-              maxLength={60}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Ahmed"
-              autoFocus
-            />
-          </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={reserve} disabled={busy}>Confirm reservation</Button>
           </DialogFooter>

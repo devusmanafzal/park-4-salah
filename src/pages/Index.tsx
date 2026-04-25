@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SlotCard, { Slot } from "@/components/SlotCard";
 import heroImg from "@/assets/hero.jpg";
 
-type Reservation = { id: string; slot_id: string; reserver_name: string; expires_at: string; active: boolean };
+type Reservation = { id: string; slot_id: string; reserver_name: string; reserver_user_id: string | null; expires_at: string; active: boolean };
 
 const Index = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
@@ -52,23 +52,23 @@ const Index = () => {
           <img src={heroImg} alt="" className="w-full h-full object-cover opacity-40" width={1536} height={1024} />
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
         </div>
-        <div className="container max-w-5xl py-16 sm:py-24">
-          <p className="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-4">A community service</p>
-          <h1 className="font-display text-4xl sm:text-6xl leading-[1.05] max-w-3xl">
+        <div className="container max-w-5xl py-12 sm:py-24 px-4">
+          <p className="text-xs sm:text-sm uppercase tracking-[0.18em] text-muted-foreground mb-3 sm:mb-4">A community service</p>
+          <h1 className="font-display text-3xl sm:text-6xl leading-[1.1] tracking-tight max-w-3xl">
             Reserve a parking spot.<br />
             <span className="text-primary">Arrive in time for Salah.</span>
           </h1>
-          <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
+          <p className="mt-5 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-xl leading-relaxed">
             Quick, simple parking sharing for our community. See what's available, hold a spot for up to 60 minutes, and pray with peace of mind.
           </p>
-          <div className="mt-8 inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary-soft text-primary text-sm">
+          <div className="mt-6 sm:mt-8 inline-flex items-center gap-2.5 px-3 sm:px-4 py-2 rounded-full bg-primary-soft text-primary text-xs sm:text-sm">
             <span className="h-2 w-2 rounded-full bg-available" />
             {availableCount} of {slots.length} spots available right now
           </div>
         </div>
       </section>
 
-      <section className="container max-w-5xl py-12 sm:py-16">
+      <section className="container max-w-5xl py-10 sm:py-16 px-4">
         <div className="flex items-baseline justify-between mb-8">
           <h2 className="font-display text-2xl sm:text-3xl">Available spots</h2>
         </div>
