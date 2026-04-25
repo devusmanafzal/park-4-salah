@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import SlotCard, { Slot } from "@/components/SlotCard";
 import heroImg from "@/assets/hero.jpg";
 
-type Reservation = { id: string; slot_id: string; reserver_name: string; expires_at: string; active: boolean };
+type Reservation = { id: string; slot_id: string; reserver_name: string; reserver_user_id: string | null; expires_at: string; active: boolean };
 
 const Index = () => {
   const [slots, setSlots] = useState<Slot[]>([]);
