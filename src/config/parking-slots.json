@@ -1,0 +1,33 @@
+{
+  "siteName": "Park & Pray",
+  "communityName": "Upplands Väsby community",
+  "timeZone": "Europe/Stockholm",
+  "bookingClosesMinutesAfterPrayer": 30,
+  "prayers": [
+    { "id": "fajr", "name": "Fajr", "time": "05:30" },
+    { "id": "dhuhr", "name": "Dhuhr", "time": "13:30" },
+    { "id": "asr", "name": "Asr", "time": "17:30" },
+    { "id": "maghrib", "name": "Maghrib", "time": "20:15" },
+    { "id": "isha", "name": "Isha", "time": "21:45" }
+  ],
+  "slots": [
+    {
+      "id": "A1",
+      "label": "Driveway A1",
+      "owner": "Community member",
+      "description": "First driveway on the left. Please park close to the garage."
+    },
+    {
+      "id": "A2",
+      "label": "Driveway A2",
+      "owner": "Community member",
+      "description": "Use the right-hand side of the double driveway."
+    },
+    {
+      "id": "B1",
+      "label": "Laneway B1",
+      "owner": "Community member",
+      "description": "Laneway entrance beside the masjid."
+    }
+  ]
+}

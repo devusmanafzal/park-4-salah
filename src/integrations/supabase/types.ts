@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      prayer_reservations: {
+        Row: {
+          active: boolean
+          cancelled_at: string | null
+          created_at: string
+          id: string
+          prayer_date: string
+          prayer_id: string
+          reserver_name: string
+          reserver_phone: string
+          reserver_user_id: string
+          slot_id: string
+        }
+        Insert: {
+          active?: boolean
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          prayer_date: string
+          prayer_id: string
+          reserver_name: string
+          reserver_phone: string
+          reserver_user_id?: string
+          slot_id: string
+        }
+        Update: {
+          active?: boolean
+          cancelled_at?: string | null
+          created_at?: string
+          id?: string
+          prayer_date?: string
+          prayer_id?: string
+          reserver_name?: string
+          reserver_phone?: string
+          reserver_user_id?: string
+          slot_id?: string
+        }
+        Relationships: []
+      }
       parking_slots: {
         Row: {
           created_at: string
@@ -135,6 +174,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_prayer_reservation: {
+        Args: { p_reservation_id: string }
+        Returns: boolean
+      }
+      get_prayer_availability: {
+        Args: { p_prayer_id: string }
+        Returns: {
+          is_mine: boolean
+          reservation_id: string | null
+          slot_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -143,6 +194,16 @@ export type Database = {
         Returns: boolean
       }
       is_locked: { Args: { _user_id: string }; Returns: boolean }
+      reserve_prayer_slot: {
+        Args: {
+          p_prayer_id: string
+          p_reserver_name: string
+          p_reserver_phone: string
+          p_slot_id: string
+        }
+        Returns: string
+      }
+      today_at_masjid: { Args: Record<PropertyKey, never>; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
